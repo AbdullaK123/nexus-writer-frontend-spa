@@ -5,6 +5,8 @@ import { Field } from "@ark-ui/react/field"
 import { useLogin } from "../../data/queries";
 import { Button, useToast } from "../common";
 import { useSearch } from "@tanstack/react-router";
+import { GoogleSignIn } from "./GoogleSignIn/GoogleSignIn";
+import styles from "./LoginForm.module.css"
 
 const loginFormSchema = z.object({
     email: z.email("Invalid email"),
@@ -133,6 +135,12 @@ export function LoginForm() {
                 <span className="card__footer-text">Don't have a vault?</span>
                 <a href="/signup" className="card__footer-link">Begin one →</a>
             </p>
+
+            <div className={styles['oauth-btns-content']}>
+                <GoogleSignIn />
+            </div>
+
+        
         </form>
     )
 }
