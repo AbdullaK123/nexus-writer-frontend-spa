@@ -3,6 +3,8 @@ import { useApi } from "../providers/ApiProvider"
 import {
     type AuthCredentials,
     type RegistrationData,
+    type ForgottenPasswordRequest,
+    type ResetPasswordRequest,
     type UserResponse,
     type ApiMessage,
     requestOptions,
@@ -105,13 +107,35 @@ export function useLogin() {
 
 export function useRegister() {
     const api = useApi()
-    const qc = useQueryClient()
     return useMutation<UserResponse, ApiError, RegistrationData>({
         mutationFn: (payload) => unwrapResultAsync(api.auth.register(payload)),
-        onSuccess: (user) => {
+    })
+}
+
+export function useRequestVerificationEmail() {
+    const api = useApi()
+    return useMutation<ApiMessage, ApiError, void>({
+        mutationFn: () => unwrapResultAsync(api.auth.requestVerificationEmail()),
+    })
+}
+
+export function useForgotPassword() {
+    const api = useApi()
+    return useMutation<ApiMessage, ApiError, ForgottenPasswordRequest>({
+        mutationFn: (payload) => unwrapResultAsync(api.auth.forgotPassword(payload)),
+    })
+}
+
+export function useResetPassword() {
+    const api = useApi()
+    const qc = useQueryClient()
+    return useMutation<ApiMessage, ApiError, ResetPasswordRequest>({
+        mutationFn: (payload) => unwrapResultAsync(api.auth.resetPassword(payload)),
+        onSuccess: () => {
+            // Reset revokes every backend session. Never leave stale authenticated
+            // application data in memory after that canonical auth change.
             qc.clear()
-            qc.setQueryData(authKeys.me(), user)
-        }
+        },
     })
 }
 

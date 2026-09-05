@@ -4,13 +4,15 @@ import { z } from "zod"
 import { Field } from "@ark-ui/react/field"
 import { useLogin } from "../../data/queries";
 import { Button, useToast } from "../common";
-import { useSearch } from "@tanstack/react-router";
+import { Link, useSearch } from "@tanstack/react-router";
 import { GoogleSignIn } from "./GoogleSignIn/GoogleSignIn";
 import styles from "./LoginForm.module.css"
 
 const loginFormSchema = z.object({
     email: z.email("Invalid email"),
-    password: z.string().min(8, "Password must be at least 8 characters"),
+    // Login accepts an opaque credential attempt. Password strength belongs
+    // to password creation/reset, not authentication.
+    password: z.string().min(1, "Password is required").max(128, "Password is too long"),
     rememberMe: z.boolean().optional(),
 })
 
@@ -88,7 +90,7 @@ export function LoginForm() {
             <Field.Root invalid={!!errors.password} className="field">
                 <div className="field__header">
                     <Field.Label className="field__label">Password</Field.Label>
-                    <a href="#" className="field__action">Forgot?</a>
+                    <Link to="/forgot-password" className="field__action">Forgot?</Link>
                 </div>
                 <Field.Input
                     type="password"

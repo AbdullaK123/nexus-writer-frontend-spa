@@ -6,19 +6,12 @@ import { useLogin, useRegister } from "../../data/queries"
 import { useNavigate, useSearch } from "@tanstack/react-router"
 import { Button, useToast } from "../common"
 import { getPasswordStrength, PasswordStrengthMeter } from "./PasswordStrengthMeter";
+import { passwordPolicySchema } from "./passwordPolicy"
 
 const signupFormSchema = z.object({
     username: z.string().min(5, "Display name must be at least 5 characters."),
     email: z.email(),
-    password: z.string().superRefine((val, ctx) => {
-        const result = getPasswordStrength(val)
-        if (result.score < 2) {
-            ctx.addIssue({
-                code: "custom",
-                message: result.warning || "Password is too weak."
-            })
-        }
-    }),
+    password: passwordPolicySchema,
     agreeTermsAndService: z.literal(true)
 })
 type SignupFormSchema = z.infer<typeof signupFormSchema>
@@ -61,8 +54,8 @@ export function SignupForm() {
                         navigate({ to: (search.redirect as string) ?? "/" })
                     },
                     onError: (err) => {
-                        error("Registration failed", err.message)
-                        setError("root", { message: err.detail })
+                        error("Registration succeeded, but login failed", err.message)
+                        setError("root", { message: "Your account was created. Please log in to continue." })
                     }
                 })
             },
@@ -158,9 +151,9 @@ export function SignupForm() {
             <Button
                 variant="primary"
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || signup.isPending || login.isPending}
             >   
-                {signup.isPending ? "Signing you up..." : "CREATE VAULT →"}
+                {signup.isPending || login.isPending ? "Creating your vault..." : "CREATE VAULT →"}
             </Button>
             <p className="card__footer">
                 <span className="card__footer-text">Already have one?</span>
