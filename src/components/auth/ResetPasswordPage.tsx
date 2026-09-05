@@ -99,7 +99,7 @@ export function ResetPasswordPage() {
             title="CHOOSE A NEW PASSWORD."
             subtitle="Use a strong password you haven't used for this account before."
         >
-            <form onSubmit={onSubmit}>
+            <form className="flex-col width-full" onSubmit={onSubmit}>
                 <Field.Root invalid={!!errors.newPassword} className="field">
                     <Field.Label className="field__label">New password</Field.Label>
                     <Field.Input

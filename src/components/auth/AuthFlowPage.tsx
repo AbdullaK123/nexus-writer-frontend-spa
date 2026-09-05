@@ -10,7 +10,7 @@ interface AuthFlowPageProps {
 export function AuthFlowPage({ badge, title, subtitle, children }: AuthFlowPageProps) {
     return (
         <div className="auth-page">
-            <aside className="auth-page__hero">
+            <aside className="auth-page__hero flex-start">
                 <div className="hero-brand__row">
                     <span className="hero-brand__logo">NX</span>
                     <p className="hero-brand__name">NEXUS WRITER</p>
