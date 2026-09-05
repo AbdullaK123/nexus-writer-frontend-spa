@@ -22,10 +22,9 @@ export function SideRail() {
     const handleLogout = () => {
         logout.mutate(undefined, {
             onSuccess: () => {
-                void navigate({
-                    to: "/login",
-                    search: { redirect: undefined },
-                })
+                // A full navigation tears down every mounted protected query before
+                // the fresh login document performs its own /auth/me probe.
+                window.location.assign("/login")
             },
             onError: (err) => {
                 error("Sign out failed", err.detail)
