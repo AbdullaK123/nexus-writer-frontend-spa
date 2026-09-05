@@ -23,8 +23,14 @@ export function routeQueryError(
         return
     }
 
+    // /auth/me is a session probe. A missing/dead session is normal auth state,
+    // including legacy backend deployments that returned 403 instead of 401.
+    // Let useCurrentUser map it to unauthenticated; never hijack a public route.
+    if (isAuthProbe && (error.status === 401 || error.status === 403)) {
+        return
+    }
+
     if (error.status === 401) {
-        if (isAuthProbe) return
         navigate({ to: "/login", search: { redirect: from } })
         return
     }
