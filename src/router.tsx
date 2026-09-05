@@ -11,6 +11,7 @@ import type { AuthContextValue } from "./data/providers/AuthProvider/AuthContext
 import { Background } from "./components/common/Background/Background";
 import { SignupPage } from "./components/auth/SignupPage";
 import { VerifyEmailPage } from "./components/auth/VerifyEmailPage";
+import { EmailVerifiedPage } from "./components/auth/EmailVerifiedPage";
 import { AppShell } from "./components";
 import { StoryDetailPage } from "./components/story/StoryDetailPage/StoryDetailPage";
 import { ChapterEditorPage } from "./components/chapter/ChapterEditorPage";
@@ -93,6 +94,15 @@ const verifyEmailRoute = createRoute({
         }
     },
     component: VerifyEmailPage,
+})
+
+const emailVerifiedRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/email-verified",
+    validateSearch: (s: Record<string, unknown>) => ({
+        error: typeof s.error === "string" ? s.error : undefined,
+    }),
+    component: EmailVerifiedPage,
 })
 
 export const errorRoute = createRoute({
@@ -180,6 +190,7 @@ export const routeTree = rootRoute.addChildren([
     loginRoute,
     signupRoute,
     verifyEmailRoute,
+    emailVerifiedRoute,
     errorRoute,
     notFoundRoute,
     appRoute.addChildren([

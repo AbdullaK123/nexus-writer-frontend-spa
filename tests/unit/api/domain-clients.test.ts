@@ -47,6 +47,20 @@ describe("domain API clients", () => {
         )
     })
 
+    test("AuthClient requests a verification email without inventing payload state", () => {
+        const api = makeApiClient()
+        const postJson = mockMethod(api, "postJson")
+
+        new AuthClient(api).requestVerificationEmail()
+
+        expect(postJson).toHaveBeenCalledWith(
+            "auth/tokens/verify-email",
+            {},
+            ApiMessageSchema,
+            expect.any(Object),
+        )
+    })
+
     test("StoryClient uses the story id in detail routes", () => {
         const api = makeApiClient()
         const getJson = mockMethod(api, "getJson")

@@ -115,6 +115,13 @@ export function useRegister() {
     })
 }
 
+export function useRequestVerificationEmail() {
+    const api = useApi()
+    return useMutation<ApiMessage, ApiError, void>({
+        mutationFn: () => unwrapResultAsync(api.auth.requestVerificationEmail()),
+    })
+}
+
 export function useLogout() {
     const api = useApi()
     const qc = useQueryClient()

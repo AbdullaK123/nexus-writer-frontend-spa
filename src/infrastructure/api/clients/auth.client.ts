@@ -60,6 +60,17 @@ export class AuthClient {
         )
     }
 
+    public requestVerificationEmail(
+        options: RequestOptions = noRequestOptions,
+    ): Promise<Result<ApiMessage, ApiError>> {
+        return this.api.postJson(
+            "auth/tokens/verify-email",
+            {},
+            ApiMessageSchema,
+            options,
+        )
+    }
+
     public getCurrentUser(
         options: RequestOptions = noRequestOptions,
     ): Promise<Result<UserResponse, ApiError>> {
