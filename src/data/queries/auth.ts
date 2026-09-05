@@ -144,13 +144,7 @@ export function useResetPassword() {
 
 export function useLogout() {
     const api = useApi()
-    const qc = useQueryClient()
     return useMutation<ApiMessage, ApiError, void>({
         mutationFn: () => unwrapResultAsync(api.auth.logout()),
-        // Auth changes invalidate EVERYTHING — every cached query is
-        // user-scoped on the backend.
-        onSuccess: () => {
-            qc.clear()
-        },
     })
 }

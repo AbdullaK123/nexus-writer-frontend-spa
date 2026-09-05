@@ -20,7 +20,13 @@ export function isEmpty(value: unknown): value is null | undefined | '' | Record
 }
 
 export function toAsyncState<T>(query: UseQueryResult<T, ApiError>): AsyncState<T, ApiError> {
-    if (query.isError) throw query.error
+    if (query.isError) {
+      // Authentication loss is a navigation event, not a render failure.
+      // QueryCache routes the user to /login; keeping the component idle here
+      // prevents React error boundaries from racing that redirect.
+      if (query.error.status === 401) return {status: "idle", data: None}
+      throw query.error
+    }
     if (query.isLoading) return {status: "loading", data: None}
     if (query.isPending) return {status: "idle", data: None}
     if (query.data && isEmpty(query.data)) return {status: "empty", data: Some(Ok(query.data as []))}

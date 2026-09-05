@@ -142,10 +142,10 @@ describe("query cache invalidation", () => {
         })
     })
 
-    test("logout clears all user-scoped cached data", () => {
+    test("logout does not clear mounted query state before the document is torn down", () => {
         useLogout()
         mutationOptions().onSuccess?.()
 
-        expect(clear).toHaveBeenCalledOnce()
+        expect(clear).not.toHaveBeenCalled()
     })
 })
