@@ -20,16 +20,20 @@ async function dragChapter(page: Page, sourceTitle: string, targetTitle: string)
 
   const sourceBox = await source.boundingBox();
   const targetBox = await target.boundingBox();
-  expect(sourceBox, `sortable source ${sourceTitle} must have a real browser layout box`).not.toBeNull();
-  expect(targetBox, `sortable target ${targetTitle} must have a real browser layout box`).not.toBeNull();
+  if (sourceBox === null) {
+    throw new Error(`sortable source ${sourceTitle} must have a real browser layout box`);
+  }
+  if (targetBox === null) {
+    throw new Error(`sortable target ${targetTitle} must have a real browser layout box`);
+  }
 
-  const sourceX = sourceBox!.x + sourceBox!.width / 2;
-  const sourceY = sourceBox!.y + sourceBox!.height / 2;
-  const targetX = targetBox!.x + targetBox!.width / 2;
-  const targetCenterY = targetBox!.y + targetBox!.height / 2;
+  const sourceX = sourceBox.x + sourceBox.width / 2;
+  const sourceY = sourceBox.y + sourceBox.height / 2;
+  const targetX = targetBox.x + targetBox.width / 2;
+  const targetCenterY = targetBox.y + targetBox.height / 2;
   const targetY = sourceY < targetCenterY
-    ? targetBox!.y + targetBox!.height * 0.75
-    : targetBox!.y + targetBox!.height * 0.25;
+    ? targetBox.y + targetBox.height * 0.75
+    : targetBox.y + targetBox.height * 0.25;
 
   await page.mouse.move(sourceX, sourceY);
   await page.mouse.down();
@@ -59,7 +63,9 @@ test("conflicting chapter reorders must execute sequentially and preserve a vali
 
   const payloads: Array<{ fromPos: number; toPos: number }> = [];
   let heldRouteCount = 0;
-  let releaseFirst!: () => void;
+  let releaseFirst: () => void = () => {
+    throw new Error("first reorder release gate was not initialized");
+  };
   const firstMayFinish = new Promise<void>((resolve) => {
     releaseFirst = resolve;
   });
@@ -112,10 +118,16 @@ test("conflicting chapter reorders must execute sequentially and preserve a vali
     timeout: 10_000,
   }).toBe(2);
 
+  const firstPayload = payloads[0];
+  const secondPayload = payloads[1];
+  if (firstPayload === undefined || secondPayload === undefined) {
+    throw new Error("expected exactly two accepted reorder payloads before computing canonical order");
+  }
+
   const expectedOrder = applyMove(
-    applyMove(ids, payloads[0]!.fromPos, payloads[0]!.toPos),
-    payloads[1]!.fromPos,
-    payloads[1]!.toPos,
+    applyMove(ids, firstPayload.fromPos, firstPayload.toPos),
+    secondPayload.fromPos,
+    secondPayload.toPos,
   );
 
   await expect.poll(async () => {

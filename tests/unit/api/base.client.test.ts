@@ -187,8 +187,10 @@ describe("ApiClient", () => {
         await makeApiClient().deleteJson("resource", ResponseSchema)
 
         const options = fetchMock.mock.calls[0]?.[1]
-        expect(options?.method).toBe("DELETE")
-        expect(options).toBeDefined()
-        expect("body" in options!).toBe(false)
+        if (options === undefined) {
+            throw new Error("DELETE request must provide fetch options")
+        }
+        expect(options.method).toBe("DELETE")
+        expect("body" in options).toBe(false)
     })
 })

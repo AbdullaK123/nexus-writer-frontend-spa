@@ -24,6 +24,11 @@ export type ChapterEditorPageProps = {
     commentsSidebar: ChapterCommentsSidebarProps
 }
 
+type ChapterSaveState = {
+    chapterId: string
+    updating: boolean
+}
+
 export function useChapterEditorPage(): ChapterEditorPageProps {
     const params = useParams({ from: "/app/stories/$storyId/$chapterId" })
     const storyChaptersState = useStoryChapters(params.storyId)
@@ -34,7 +39,11 @@ export function useChapterEditorPage(): ChapterEditorPageProps {
     const chapterState = useChapter(params.chapterId, true, chapterBelongsToStory)
     const commentsState = useChapterComments(params.chapterId, chapterBelongsToStory)
     const updateChapterMutation = useUpdateChapter(params.chapterId)
-    const [updating, setUpdating] = useState(false)
+    const [saveState, setSaveState] = useState<ChapterSaveState>({
+        chapterId: params.chapterId,
+        updating: false,
+    })
+    const updating = saveState.chapterId === params.chapterId && saveState.updating
     const [query, setQuery] = useState("")
     const [threadCreationPending, setThreadCreationPending] = useState(false)
     const saveTrackerRef = useRef(new LatestOperation())
@@ -54,13 +63,18 @@ export function useChapterEditorPage(): ChapterEditorPageProps {
         // eslint-disable-next-line react-hooks/refs
         () => debounce((htmlContent: string) => {
             const revision = saveTrackerRef.current.start()
-            setUpdating(true)
+            const chapterId = params.chapterId
+            setSaveState({ chapterId, updating: true })
             updateChapterMutation.mutate(
                 { content: htmlContent },
                 {
                     onSettled: () => {
                         if (saveTrackerRef.current.isLatest(revision)) {
-                            setUpdating(false)
+                            setSaveState((current) =>
+                                current.chapterId === chapterId
+                                    ? { ...current, updating: false }
+                                    : current
+                            )
                         }
                     }
                 }
@@ -72,7 +86,6 @@ export function useChapterEditorPage(): ChapterEditorPageProps {
 
     useEffect(() => {
         saveTrackerRef.current.invalidate()
-        setUpdating(false)
 
         return () => {
             debouncedUpdate.flush()

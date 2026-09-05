@@ -31,7 +31,9 @@ describe("chat turn integration", () => {
         const gate = new SingleFlightGate()
         const slot = new AbortControllerSlot()
         const controller = beginChatTurn(gate, slot)
-        expect(controller).not.toBeNull()
+        if (controller === null) {
+            throw new Error("the first chat turn must acquire the single-flight gate")
+        }
 
         const fetchMock = vi.fn().mockResolvedValue(
             sseResponse([
@@ -48,7 +50,7 @@ describe("chat turn integration", () => {
                 "story-1",
                 "thread-1",
                 "Say hello",
-                controller!.signal,
+                controller.signal,
             ),
             {
                 onEvent: (event) => {

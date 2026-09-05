@@ -30,7 +30,9 @@ describe("chat cancellation integration", () => {
         const gate = new SingleFlightGate()
         const slot = new AbortControllerSlot()
         const controller = beginChatTurn(gate, slot)
-        expect(controller).not.toBeNull()
+        if (controller === null) {
+            throw new Error("the first chat turn must acquire the single-flight gate")
+        }
 
         vi.stubGlobal("fetch", abortableFetch())
 
@@ -39,7 +41,7 @@ describe("chat cancellation integration", () => {
                 "story-1",
                 "thread-1",
                 "hello",
-                controller!.signal,
+                controller.signal,
             ),
             { onEvent: vi.fn(), onClose: None },
         )
