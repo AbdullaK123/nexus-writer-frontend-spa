@@ -61,6 +61,38 @@ describe("domain API clients", () => {
         )
     })
 
+    test("AuthClient sends forgot-password email without exposing account lookup semantics", () => {
+        const api = makeApiClient()
+        const postJson = mockMethod(api, "postJson")
+        const payload = { email: "a@example.com" }
+
+        new AuthClient(api).forgotPassword(payload)
+
+        expect(postJson).toHaveBeenCalledWith(
+            "auth/tokens/forgot-password",
+            payload,
+            ApiMessageSchema,
+            expect.any(Object),
+        )
+    })
+
+    test("AuthClient maps reset password to the backend wire field", () => {
+        const api = makeApiClient()
+        const postJson = mockMethod(api, "postJson")
+
+        new AuthClient(api).resetPassword({
+            token: "reset-token",
+            newPassword: "NewPassword1!",
+        })
+
+        expect(postJson).toHaveBeenCalledWith(
+            "auth/tokens/reset-password",
+            { token: "reset-token", new_password: "NewPassword1!" },
+            ApiMessageSchema,
+            expect.any(Object),
+        )
+    })
+
     test("StoryClient uses the story id in detail routes", () => {
         const api = makeApiClient()
         const getJson = mockMethod(api, "getJson")

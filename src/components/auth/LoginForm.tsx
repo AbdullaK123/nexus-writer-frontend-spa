@@ -4,7 +4,7 @@ import { z } from "zod"
 import { Field } from "@ark-ui/react/field"
 import { useLogin } from "../../data/queries";
 import { Button, useToast } from "../common";
-import { useSearch } from "@tanstack/react-router";
+import { Link, useSearch } from "@tanstack/react-router";
 import { GoogleSignIn } from "./GoogleSignIn/GoogleSignIn";
 import styles from "./LoginForm.module.css"
 
@@ -90,7 +90,7 @@ export function LoginForm() {
             <Field.Root invalid={!!errors.password} className="field">
                 <div className="field__header">
                     <Field.Label className="field__label">Password</Field.Label>
-                    <a href="#" className="field__action">Forgot?</a>
+                    <Link to="/forgot-password" className="field__action">Forgot?</Link>
                 </div>
                 <Field.Input
                     type="password"

@@ -12,6 +12,8 @@ import { Background } from "./components/common/Background/Background";
 import { SignupPage } from "./components/auth/SignupPage";
 import { VerifyEmailPage } from "./components/auth/VerifyEmailPage";
 import { EmailVerifiedPage } from "./components/auth/EmailVerifiedPage";
+import { ForgotPasswordPage } from "./components/auth/ForgotPasswordPage";
+import { ResetPasswordPage } from "./components/auth/ResetPasswordPage";
 import { AppShell } from "./components";
 import { StoryDetailPage } from "./components/story/StoryDetailPage/StoryDetailPage";
 import { ChapterEditorPage } from "./components/chapter/ChapterEditorPage";
@@ -76,6 +78,23 @@ const signupRoute = createRoute({
         redirect: typeof s.redirect === "string" ? s.redirect : undefined
     }),
     component: SignupPage
+})
+
+const forgotPasswordRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/forgot-password",
+    component: ForgotPasswordPage,
+})
+
+const resetPasswordRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/reset-password",
+    validateSearch: (s: Record<string, unknown>) => ({
+        token: typeof s.token === "string" && s.token.length > 0 && s.token.length <= 256
+            ? s.token
+            : undefined,
+    }),
+    component: ResetPasswordPage,
 })
 
 const verifyEmailRoute = createRoute({
@@ -189,6 +208,8 @@ const settingsPage = createRoute({
 export const routeTree = rootRoute.addChildren([
     loginRoute,
     signupRoute,
+    forgotPasswordRoute,
+    resetPasswordRoute,
     verifyEmailRoute,
     emailVerifiedRoute,
     errorRoute,

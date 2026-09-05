@@ -2,6 +2,8 @@ import { ApiClient } from "./base.client"
 import {
     type RegistrationData,
     type AuthCredentials,
+    type ForgottenPasswordRequest,
+    type ResetPasswordRequest,
     type UserResponse,
     UserResponseSchema,
     type ApiMessage,
@@ -66,6 +68,33 @@ export class AuthClient {
         return this.api.postJson(
             "auth/tokens/verify-email",
             {},
+            ApiMessageSchema,
+            options,
+        )
+    }
+
+    public forgotPassword(
+        payload: ForgottenPasswordRequest,
+        options: RequestOptions = noRequestOptions,
+    ): Promise<Result<ApiMessage, ApiError>> {
+        return this.api.postJson(
+            "auth/tokens/forgot-password",
+            payload,
+            ApiMessageSchema,
+            options,
+        )
+    }
+
+    public resetPassword(
+        payload: ResetPasswordRequest,
+        options: RequestOptions = noRequestOptions,
+    ): Promise<Result<ApiMessage, ApiError>> {
+        return this.api.postJson(
+            "auth/tokens/reset-password",
+            {
+                token: payload.token,
+                new_password: payload.newPassword,
+            },
             ApiMessageSchema,
             options,
         )

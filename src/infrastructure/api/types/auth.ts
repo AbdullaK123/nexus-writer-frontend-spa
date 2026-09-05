@@ -17,6 +17,17 @@ export const AuthCredentialsSchema = z.object({
 })
 export type AuthCredentials = z.infer<typeof AuthCredentialsSchema>
 
+export const ForgottenPasswordRequestSchema = z.object({
+    email: z.email(),
+})
+export type ForgottenPasswordRequest = z.infer<typeof ForgottenPasswordRequestSchema>
+
+export const ResetPasswordRequestSchema = z.object({
+    token: z.string().min(1).max(256),
+    newPassword: z.string().min(1).max(128),
+})
+export type ResetPasswordRequest = z.infer<typeof ResetPasswordRequestSchema>
+
 // ─── Responses ───────────────────────────────────────────────
 export const AppearanceSettingsSchema = z.object({
     theme: z.enum(["system", "light", "dark"]).default("system"),
