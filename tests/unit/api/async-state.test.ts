@@ -51,6 +51,15 @@ describe("toAsyncState", () => {
         })
     })
 
+    test("maps authentication loss to idle while routing handles the redirect", () => {
+        const state = toAsyncState(queryResult({
+            isError: true,
+            error: new ApiError(401, "Authentication required"),
+        }))
+
+        expect(state).toEqual({ status: "idle", data: None })
+    })
+
     test("maps empty arrays to empty", () => {
         const state = toAsyncState(queryResult<[]>( { data: [] } ))
 
@@ -66,7 +75,7 @@ describe("toAsyncState", () => {
         }
     })
 
-    test("never converts an errored query into success", () => {
+    test("still throws non-auth query failures", () => {
         const error = new ApiError(500, "boom")
         const query = queryResult({ isError: true, error })
 
