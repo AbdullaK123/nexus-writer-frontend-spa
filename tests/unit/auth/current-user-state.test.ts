@@ -53,11 +53,11 @@ describe("useCurrentUser", () => {
         expect(useCurrentUser()).toEqual({ status: "loading" })
     })
 
-    test("maps 401 to unauthenticated instead of error", () => {
+    test.each([401, 403])("maps stale-session status %s to unauthenticated", (status) => {
         vi.mocked(useQuery).mockReturnValue({
             isPending: false,
             isError: true,
-            error: new ApiError(401, "Authentication required"),
+            error: new ApiError(status, "Session is no longer valid"),
         } as never)
 
         expect(useCurrentUser()).toEqual({ status: "unauthenticated" })
