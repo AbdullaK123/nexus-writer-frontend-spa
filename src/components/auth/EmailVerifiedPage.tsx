@@ -19,7 +19,7 @@ export function EmailVerifiedPage() {
             return
         }
 
-        await navigate({ to: "/login" })
+        await navigate({ to: "/login", search: {} })
     }
 
     const handleInvalid = async () => {
@@ -28,7 +28,7 @@ export function EmailVerifiedPage() {
             return
         }
 
-        await navigate({ to: "/login" })
+        await navigate({ to: "/login", search: {} })
     }
 
     if (invalid) {

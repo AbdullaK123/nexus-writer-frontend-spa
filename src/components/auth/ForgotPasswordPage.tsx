@@ -36,7 +36,7 @@ export function ForgotPasswordPage() {
                 title="CHECK YOUR EMAIL."
                 subtitle="If an account exists for that address, we've sent password reset instructions."
             >
-                <Link to="/login" className="card__footer-link">Back to sign in →</Link>
+                <Link to="/login" search={{}} className="card__footer-link">Back to sign in →</Link>
             </AuthFlowPage>
         )
     }
@@ -72,7 +72,7 @@ export function ForgotPasswordPage() {
                     {forgotPassword.isPending ? "Sending..." : "Send reset link"}
                 </Button>
             </form>
-            <Link to="/login" className="card__footer-link">Back to sign in →</Link>
+            <Link to="/login" search={{}} className="card__footer-link">Back to sign in →</Link>
         </AuthFlowPage>
     )
 }
