@@ -11,8 +11,13 @@ import { queryClientDefaults } from './data/providers/QueryProvider/config.ts';
 import { Toast } from './components/common/Toast/Toast.tsx';
 import { router } from "./router"
 import { routeQueryError } from "./infrastructure/query-error-routing"
+import { applyInitialTheme } from "./infrastructure/theme"
 
-// ─── Composition root ───────────────────────────────────────
+// Apply the locally remembered preference before React mounts so public routes
+// do not begin life in the default light theme while auth is being resolved.
+applyInitialTheme()
+
+// ─── Composition root ────────────────────────────────────────
 //
 // The ONLY place in the app that bridges from raw nullable / throwing
 // APIs (`document.getElementById`, env config) into the Option/Result

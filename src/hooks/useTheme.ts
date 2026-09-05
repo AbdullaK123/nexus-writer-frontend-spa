@@ -1,7 +1,12 @@
 import { useEffect } from "react";
+import {
+    applyThemePreference,
+    persistBrowserThemePreference,
+    type ResolvedTheme,
+    type ThemePreference,
+} from "../infrastructure/theme";
 
-export type ThemePreference = "system" | "light" | "dark"
-export type ResolvedTheme = "light" | "dark"
+export type { ResolvedTheme, ThemePreference }
 
 export function useTheme(preference: ThemePreference) {
     useEffect(() => {
@@ -10,16 +15,12 @@ export function useTheme(preference: ThemePreference) {
         )
 
         const applyTheme = () => {
-            const theme: ResolvedTheme =
-                preference === "system"
-                    ? media.matches
-                        ? "dark"
-                        : "light"
-                    : preference
-
-            document.documentElement.dataset.theme = theme
+            applyThemePreference(preference, media.matches)
         }
 
+        // The authenticated server setting remains canonical, but mirroring the
+        // latest preference locally lets public routes keep the same appearance.
+        persistBrowserThemePreference(preference)
         applyTheme()
 
         if (preference !== "system") {
