@@ -31,11 +31,13 @@ export function AppRouter() {
       ? settings.unwrap().appearance.theme
       : "system"
 
+  const verified = auth.status === "authenticated" && auth.user.emailVerified
+
   useTheme(theme)
 
   useEffect(() => {
     router.invalidate();
-  }, [auth.status]);
+  }, [auth.status, verified]);
 
   useEffect(() => {
     stoppedRef.current = false;
@@ -49,7 +51,7 @@ export function AppRouter() {
     )
 
     const scheduleReconnect = (reason: string) => {
-      if (stoppedRef.current || auth.status !== "authenticated") return;
+      if (stoppedRef.current || !verified) return;
       if (retriesRef.current >= MAX_RETRIES) {
         info("Notifications stopped", "Could not reconnect.");
         return;
@@ -66,7 +68,7 @@ export function AppRouter() {
     };
 
     const connect = () => {
-      if (stoppedRef.current || auth.status !== "authenticated") return;
+      if (stoppedRef.current || !verified) return;
 
       const controller = streamSlotRef.current.replace()
 
@@ -129,7 +131,7 @@ export function AppRouter() {
           const err = result.unwrapErr();
 
           if (isTerminal(err)) {
-            if (err._tag === "SseHttpError" && (err.status === 401 || err.status === 403)) {
+            if (err._tag === "SseHttpError" && err.status === 401) {
               void qc.resetQueries({
                 queryKey: authKeys.me(),
                 exact: true,
@@ -152,7 +154,7 @@ export function AppRouter() {
     cleanup()
     stoppedRef.current = false
 
-    if (auth.status === "authenticated") {
+    if (verified) {
       timerRef.current = window.setTimeout(() => {
         timerRef.current = null;
         connect();
@@ -160,7 +162,7 @@ export function AppRouter() {
     }
 
     return cleanup;
-  }, [auth.status, info, qc, error, settings]);
+  }, [verified, info, qc, error, settings]);
 
   return <RouterProvider router={router} context={{ auth }} />;
 }

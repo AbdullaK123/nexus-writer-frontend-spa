@@ -214,11 +214,12 @@ describe("API response schemas", () => {
         ).toBe(false)
     })
 
-    test("accepts a complete user response and rejects missing settings", () => {
+    test("requires explicit email verification state in a complete user response", () => {
         const user = {
             id: "user-1",
             username: "abdulla",
             email: "abdulla@example.com",
+            emailVerified: false,
             profileImg: null,
             settings: {
                 appearance: { theme: "system", reduced_motion: false },
@@ -239,6 +240,7 @@ describe("API response schemas", () => {
 
         expect(UserResponseSchema.safeParse(user).success).toBe(true)
         expect(UserResponseSchema.safeParse({ ...user, settings: undefined }).success).toBe(false)
+        expect(UserResponseSchema.safeParse({ ...user, emailVerified: undefined }).success).toBe(false)
     })
 
     test("accepts dashboard counters and jump-back-in chapters", () => {

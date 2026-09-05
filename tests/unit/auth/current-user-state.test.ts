@@ -19,6 +19,7 @@ const user = {
     id: "user-1",
     username: "abdulla",
     email: "abdulla@example.com",
+    emailVerified: false,
     profileImg: null,
     settings: {
         appearance: { theme: "system" as const, reduced_motion: false },
@@ -73,7 +74,7 @@ describe("useCurrentUser", () => {
         expect(useCurrentUser()).toEqual({ status: "error", error })
     })
 
-    test("maps a resolved user to authenticated", () => {
+    test("maps a resolved user to authenticated without hiding verification state", () => {
         vi.mocked(useQuery).mockReturnValue({
             isPending: false,
             isError: false,

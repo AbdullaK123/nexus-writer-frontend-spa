@@ -80,6 +80,7 @@ export const UserResponseSchema = z.object({
     id: z.string(),
     username: z.string(),
     email: z.string(),
+    emailVerified: z.boolean(),
     profileImg: z.string().optional().nullable(),
     settings: UserSettingsSchema
 })

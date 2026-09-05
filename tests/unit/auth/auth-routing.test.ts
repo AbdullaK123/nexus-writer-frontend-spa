@@ -3,6 +3,7 @@ import { describe, expect, test } from "vitest"
 import {
     decideAppAuthRoute,
     decideLoginAuthRoute,
+    decideVerifyEmailRoute,
 } from "../../../src/infrastructure/auth-routing"
 import { ApiError } from "../../../src/shared/types"
 
@@ -12,6 +13,7 @@ const authenticated = {
         id: "user-1",
         username: "abdulla",
         email: "a@example.com",
+        emailVerified: true,
         profileImg: null,
         settings: {
             appearance: { theme: "system" as const, reduced_motion: false },
@@ -31,10 +33,21 @@ const authenticated = {
     },
 }
 
+const unverified = {
+    ...authenticated,
+    user: { ...authenticated.user, emailVerified: false },
+}
+
 describe("app auth routing", () => {
-    test("allows authenticated users", () => {
+    test("allows verified authenticated users", () => {
         expect(decideAppAuthRoute(authenticated, "/stories/story-1")).toEqual({
             kind: "allow",
+        })
+    })
+
+    test("redirects authenticated unverified users to verification", () => {
+        expect(decideAppAuthRoute(unverified, "/stories/story-1")).toEqual({
+            kind: "redirect-verify-email",
         })
     })
 
@@ -67,9 +80,15 @@ describe("app auth routing", () => {
 })
 
 describe("login auth routing", () => {
-    test("authenticated users leave login for home", () => {
+    test("verified authenticated users leave login for home", () => {
         expect(decideLoginAuthRoute(authenticated)).toEqual({
             kind: "redirect-home",
+        })
+    })
+
+    test("unverified authenticated users leave login for verification", () => {
+        expect(decideLoginAuthRoute(unverified)).toEqual({
+            kind: "redirect-verify-email",
         })
     })
 
@@ -77,7 +96,27 @@ describe("login auth routing", () => {
         { status: "loading" as const },
         { status: "unauthenticated" as const },
         { status: "error" as const, error: new ApiError(500, "boom") },
-    ])("never redirects a non-authenticated login state back to login", (auth) => {
+    ])("allows non-authenticated login state", (auth) => {
         expect(decideLoginAuthRoute(auth)).toEqual({ kind: "allow" })
+    })
+})
+
+describe("verify email auth routing", () => {
+    test("allows authenticated unverified users", () => {
+        expect(decideVerifyEmailRoute(unverified)).toEqual({ kind: "allow" })
+    })
+
+    test("redirects verified users home", () => {
+        expect(decideVerifyEmailRoute(authenticated)).toEqual({ kind: "redirect-home" })
+    })
+
+    test("redirects unauthenticated users to login", () => {
+        expect(decideVerifyEmailRoute({ status: "unauthenticated" })).toEqual({
+            kind: "redirect-login",
+        })
+    })
+
+    test("allows loading state to settle", () => {
+        expect(decideVerifyEmailRoute({ status: "loading" })).toEqual({ kind: "allow" })
     })
 })

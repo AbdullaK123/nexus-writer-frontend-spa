@@ -10,6 +10,7 @@ import { LoginPage } from "./components/auth";
 import type { AuthContextValue } from "./data/providers/AuthProvider/AuthContext"
 import { Background } from "./components/common/Background/Background";
 import { SignupPage } from "./components/auth/SignupPage";
+import { VerifyEmailPage } from "./components/auth/VerifyEmailPage";
 import { AppShell } from "./components";
 import { StoryDetailPage } from "./components/story/StoryDetailPage/StoryDetailPage";
 import { ChapterEditorPage } from "./components/chapter/ChapterEditorPage";
@@ -19,7 +20,11 @@ import { z } from "zod";
 import { SettingsPage } from "./components/settings";
 import { ErrorPage } from "./components/common/ErrorPage";
 import { NotFoundPage } from "./components/common/NotFoundPage";
-import { decideAppAuthRoute, decideLoginAuthRoute } from "./infrastructure/auth-routing";
+import {
+    decideAppAuthRoute,
+    decideLoginAuthRoute,
+    decideVerifyEmailRoute,
+} from "./infrastructure/auth-routing";
 
 export interface RouterContext {
     auth: AuthContextValue
@@ -44,6 +49,9 @@ const loginRoute = createRoute({
         if (decision.kind === "redirect-home") {
             throw redirect({ to: "/" })
         }
+        if (decision.kind === "redirect-verify-email") {
+            throw redirect({ to: "/verify-email" })
+        }
     },
     validateSearch: (s: Record<string, unknown>) => ({
         redirect: typeof s.redirect === "string" ? s.redirect : undefined
@@ -54,10 +62,37 @@ const loginRoute = createRoute({
 const signupRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: "/signup",
+    beforeLoad: ({ context }) => {
+        const decision = decideLoginAuthRoute(context.auth)
+        if (decision.kind === "redirect-home") {
+            throw redirect({ to: "/" })
+        }
+        if (decision.kind === "redirect-verify-email") {
+            throw redirect({ to: "/verify-email" })
+        }
+    },
     validateSearch: (s: Record<string, unknown>) => ({
         redirect: typeof s.redirect === "string" ? s.redirect : undefined
     }),
     component: SignupPage
+})
+
+const verifyEmailRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/verify-email",
+    beforeLoad: ({ context }) => {
+        const decision = decideVerifyEmailRoute(context.auth)
+        if (decision.kind === "redirect-home") {
+            throw redirect({ to: "/" })
+        }
+        if (decision.kind === "redirect-login") {
+            throw redirect({
+                to: "/login",
+                search: { redirect: "/verify-email" },
+            })
+        }
+    },
+    component: VerifyEmailPage,
 })
 
 export const errorRoute = createRoute({
@@ -88,6 +123,9 @@ const appRoute = createRoute({
                 to: "/login",
                 search: { redirect: decision.redirect },
             })
+        }
+        if (decision.kind === "redirect-verify-email") {
+            throw redirect({ to: "/verify-email" })
         }
     },
     component: () => {
@@ -141,6 +179,7 @@ const settingsPage = createRoute({
 export const routeTree = rootRoute.addChildren([
     loginRoute,
     signupRoute,
+    verifyEmailRoute,
     errorRoute,
     notFoundRoute,
     appRoute.addChildren([
