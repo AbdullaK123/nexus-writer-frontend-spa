@@ -79,7 +79,14 @@ export function ResetPasswordPage() {
                 title="PASSWORD RESET."
                 subtitle="Your password has been changed and your previous sessions have been signed out."
             >
-                <Button type="button" variant="primary" onClick={() => void navigate({ to: "/login", search: {} })}>
+                <Button
+                    type="button"
+                    variant="primary"
+                    onClick={() => void navigate({
+                        to: "/login",
+                        search: { redirect: undefined },
+                    })}
+                >
                     Log in →
                 </Button>
             </AuthFlowPage>
