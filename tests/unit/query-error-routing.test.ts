@@ -4,13 +4,13 @@ import { routeQueryError } from "../../src/infrastructure/query-error-routing"
 import { ApiError } from "../../src/shared/types"
 
 describe("routeQueryError", () => {
-    test("ignores a 401 from the current-user auth probe", () => {
+    test.each([401, 403])("ignores stale-session status %s from the current-user auth probe", (status) => {
         const navigate = vi.fn()
 
         routeQueryError(
-            new ApiError(401, "Authentication required"),
+            new ApiError(status, "Session is no longer valid"),
             ["auth", "me"],
-            "/login",
+            "/reset-password",
             navigate,
         )
 
@@ -29,6 +29,22 @@ describe("routeQueryError", () => {
 
         expect(navigate).toHaveBeenCalledWith({
             to: "/login",
+            search: { redirect: "/stories/story-1" },
+        })
+    })
+
+    test("does not reinterpret a real non-auth 403 as logged out", () => {
+        const navigate = vi.fn()
+
+        routeQueryError(
+            new ApiError(403, "Forbidden"),
+            ["stories", "story-1"],
+            "/stories/story-1",
+            navigate,
+        )
+
+        expect(navigate).toHaveBeenCalledWith({
+            to: "/error",
             search: { redirect: "/stories/story-1" },
         })
     })
