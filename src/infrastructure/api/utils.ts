@@ -76,6 +76,3 @@ export function resolveAsyncStates<T extends Record<string, unknown>, E>(
     data: data as T
   }
 }
-
-export const toOption = <T>(val: T | undefined | null): Option<T> => 
-  (val !== undefined && val !== null) ? Some(val) : None;
