@@ -1,0 +1,7 @@
+.content {
+    display: inline-flex;
+    padding: var(--space-3);
+    gap: var(--space-3);
+    justify-content: center;
+    align-items: center;
+}

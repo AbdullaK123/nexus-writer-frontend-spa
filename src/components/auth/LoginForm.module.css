@@ -1,0 +1,7 @@
+.oauth-btns-content {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    padding: var(--space-3);
+    align-items: center;
+}

@@ -33,12 +33,18 @@ const removeQueries = vi.fn()
 const navigate = vi.fn()
 const matchRoute = vi.fn()
 
-function mutationOptions() {
-    return vi.mocked(useMutation).mock.calls.at(-1)?.[0] as {
-        onMutate?: (variables: any) => any
-        onError?: (error: unknown, variables: any, context: any) => any
-        onSuccess?: (data: any, variables?: any, context?: any) => any
+type TestMutationOptions = {
+    onMutate?: (...args: unknown[]) => unknown
+    onError?: (...args: unknown[]) => unknown
+    onSuccess?: (...args: unknown[]) => unknown
+}
+
+function mutationOptions(): TestMutationOptions {
+    const options = vi.mocked(useMutation).mock.calls.at(-1)?.[0]
+    if (options === undefined) {
+        throw new Error("expected a mutation hook to register options")
     }
+    return options as unknown as TestMutationOptions
 }
 
 const cachedChapter = {
