@@ -3,9 +3,10 @@ import styles from "./SideRail.module.css"
 import { ModalWithTrigger } from "../../Modal";
 import { useState } from "react";
 import { None } from "oxide.ts";
-import { useChatLinks, useEditorLinks } from "../../../../data/queries";
+import { useChatLinks, useEditorLinks, useLogout } from "../../../../data/queries";
 import { EditModalContent } from "./EditModalContent";
 import { ChatModalContent } from "./ChatModalContent/ChatModalContent";
+import { useToast } from "../../Toast/Toast";
 
 
 export function SideRail() {
@@ -15,6 +16,22 @@ export function SideRail() {
     const [chatOpen, setChatOpen] = useState(false)
     const [editLinksState, refetchEditLinks] = useEditorLinks()
     const [chatLinksState, refetchChatLinks] = useChatLinks()
+    const logout = useLogout()
+    const { error } = useToast()
+
+    const handleLogout = () => {
+        logout.mutate(undefined, {
+            onSuccess: () => {
+                void navigate({
+                    to: "/login",
+                    search: { redirect: undefined },
+                })
+            },
+            onError: (err) => {
+                error("Sign out failed", err.detail)
+            },
+        })
+    }
 
     return (
         <nav className={styles['siderail-container']}>
@@ -87,6 +104,13 @@ export function SideRail() {
                 onClick={() => navigate({ to: "/settings"})}
             >
                 SET
+            </button>
+            <button
+                className={styles['siderail-item']}
+                disabled={logout.isPending}
+                onClick={handleLogout}
+            >
+                {logout.isPending ? "..." : "OUT"}
             </button>
         </nav>
     )
