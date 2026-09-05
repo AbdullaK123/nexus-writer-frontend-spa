@@ -127,16 +127,16 @@ export function LoginForm() {
                 {login.isPending ? "Signing you in..." : "Launch Nexus  →"}
             </Button>
 
+            <p className="card__footer">
+                <span className="card__footer-text">Don't have a vault?</span>
+                <a href="/signup" className="card__footer-link">Begin one →</a>
+            </p>
+
             <div className="divider">
                 <span className="divider__line" />
                 <span className="divider__label">OR</span>
                 <span className="divider__line" />
             </div>
-
-            <p className="card__footer">
-                <span className="card__footer-text">Don't have a vault?</span>
-                <a href="/signup" className="card__footer-link">Begin one →</a>
-            </p>
 
             <div className={styles['oauth-btns-content']}>
                 <GoogleSignIn />

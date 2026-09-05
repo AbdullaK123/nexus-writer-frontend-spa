@@ -53,7 +53,7 @@ export function ForgotPasswordPage() {
             title="FORGOT YOUR PASSWORD?"
             subtitle="Enter your email and we'll send reset instructions if an eligible account exists."
         >
-            <form onSubmit={onSubmit}>
+            <form className="flex-col width-full" onSubmit={onSubmit}>
                 <Field.Root invalid={!!errors.email} className="field">
                     <Field.Label className="field__label">Email</Field.Label>
                     <Field.Input
