@@ -27,6 +27,7 @@ import {
     decideAppAuthRoute,
     decideLoginAuthRoute,
     decideVerifyEmailRoute,
+    parseResetTokenSearch,
 } from "./infrastructure/auth-routing";
 
 export interface RouterContext {
@@ -90,9 +91,7 @@ const resetPasswordRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: "/reset-password",
     validateSearch: (s: Record<string, unknown>) => ({
-        token: typeof s.token === "string" && s.token.length > 0 && s.token.length <= 256
-            ? s.token
-            : undefined,
+        token: parseResetTokenSearch(s.token),
     }),
     component: ResetPasswordPage,
 })

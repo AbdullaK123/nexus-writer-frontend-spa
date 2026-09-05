@@ -2,7 +2,11 @@ import { beforeEach, describe, expect, test, vi } from "vitest"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { useApi } from "../../../src/data/providers/ApiProvider"
-import { useForgotPassword, useResetPassword } from "../../../src/data/queries/auth"
+import {
+    useForgotPassword,
+    useRequestVerificationEmail,
+    useResetPassword,
+} from "../../../src/data/queries/auth"
 
 vi.mock("@tanstack/react-query", () => ({
     useQuery: vi.fn(),
@@ -28,13 +32,21 @@ beforeEach(() => {
     vi.mocked(useQueryClient).mockReturnValue({ clear } as never)
     vi.mocked(useApi).mockReturnValue({
         auth: {
+            requestVerificationEmail: vi.fn(),
             forgotPassword: vi.fn(),
             resetPassword: vi.fn(),
         },
     } as never)
 })
 
-describe("password recovery cache semantics", () => {
+describe("auth recovery cache semantics", () => {
+    test("resend verification never upgrades email verification locally", () => {
+        useRequestVerificationEmail()
+
+        expect(mutationOptions().onSuccess).toBeUndefined()
+        expect(clear).not.toHaveBeenCalled()
+    })
+
     test("forgot-password does not mutate authenticated frontend truth", () => {
         useForgotPassword()
 

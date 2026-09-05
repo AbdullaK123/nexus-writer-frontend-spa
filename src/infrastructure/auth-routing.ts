@@ -15,6 +15,12 @@ export type VerifyEmailAuthDecision =
     | { kind: "redirect-home" }
     | { kind: "redirect-login" }
 
+export function parseResetTokenSearch(value: unknown): string | undefined {
+    return typeof value === "string" && value.length > 0 && value.length <= 256
+        ? value
+        : undefined
+}
+
 export function decideAppAuthRoute(
     auth: AuthContextValue,
     locationHref: string,

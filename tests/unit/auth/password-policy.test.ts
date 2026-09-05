@@ -18,6 +18,13 @@ describe("password creation policy", () => {
         expect(meetsPasswordPolicy(password)).toBe(false)
     })
 
+    test.each(["[", "]", "\\", "\"", "'", "|"])(
+        "keeps backend special character %s valid",
+        (specialCharacter) => {
+            expect(meetsPasswordPolicy(`Strong1${specialCharacter}`)).toBe(true)
+        },
+    )
+
     test("rejects passwords longer than the backend credential bound", () => {
         const password = `Aa1!${"x".repeat(125)}`
         expect(password.length).toBeGreaterThan(128)

@@ -4,6 +4,7 @@ import {
     decideAppAuthRoute,
     decideLoginAuthRoute,
     decideVerifyEmailRoute,
+    parseResetTokenSearch,
 } from "../../../src/infrastructure/auth-routing"
 import { ApiError } from "../../../src/shared/types"
 
@@ -118,5 +119,25 @@ describe("verify email auth routing", () => {
 
     test("allows loading state to settle", () => {
         expect(decideVerifyEmailRoute({ status: "loading" })).toEqual({ kind: "allow" })
+    })
+})
+
+describe("reset token search boundary", () => {
+    test("preserves an opaque token within the backend bound", () => {
+        const token = " xYz.-_opaque token "
+        expect(parseResetTokenSearch(token)).toBe(token)
+    })
+
+    test.each([undefined, null, 123, {}, ""])("rejects non-token search input %#", (value) => {
+        expect(parseResetTokenSearch(value)).toBeUndefined()
+    })
+
+    test("accepts exactly 256 characters", () => {
+        const token = "a".repeat(256)
+        expect(parseResetTokenSearch(token)).toBe(token)
+    })
+
+    test("rejects an oversized token before it reaches the reset form", () => {
+        expect(parseResetTokenSearch("a".repeat(257))).toBeUndefined()
     })
 })
