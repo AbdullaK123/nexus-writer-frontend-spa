@@ -12,6 +12,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { authKeys, chapterKeys, storyKeys } from "./data/queries";
 import { isRetryable, isTerminal } from "./infrastructure/sse/notifications";
 import { useTheme } from "./hooks";
+import { readBrowserThemePreference } from "./infrastructure/theme";
 
 const MAX_RETRIES = 5;
 const BASE_DELAY_MS = 1000;
@@ -29,7 +30,7 @@ export function AppRouter() {
 
   const theme = settings.isSome()
       ? settings.unwrap().appearance.theme
-      : "system"
+      : readBrowserThemePreference()
 
   const verified = auth.status === "authenticated" && auth.user.emailVerified
 
