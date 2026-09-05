@@ -105,13 +105,8 @@ export function useLogin() {
 
 export function useRegister() {
     const api = useApi()
-    const qc = useQueryClient()
     return useMutation<UserResponse, ApiError, RegistrationData>({
         mutationFn: (payload) => unwrapResultAsync(api.auth.register(payload)),
-        onSuccess: (user) => {
-            qc.clear()
-            qc.setQueryData(authKeys.me(), user)
-        }
     })
 }
 

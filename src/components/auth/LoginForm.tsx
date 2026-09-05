@@ -10,7 +10,9 @@ import styles from "./LoginForm.module.css"
 
 const loginFormSchema = z.object({
     email: z.email("Invalid email"),
-    password: z.string().min(8, "Password must be at least 8 characters"),
+    // Login accepts an opaque credential attempt. Password strength belongs
+    // to password creation/reset, not authentication.
+    password: z.string().min(1, "Password is required").max(128, "Password is too long"),
     rememberMe: z.boolean().optional(),
 })
 

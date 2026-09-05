@@ -55,16 +55,11 @@ describe("account switch cache isolation", () => {
         expect(setQueryData).toHaveBeenCalledWith(authKeys.me(), newUser)
     })
 
-    test("successful registration cannot inherit private cache from a prior session", () => {
-        const newUser = { id: "new-user", username: "new-user" }
-
+    test("successful registration does not pretend an account-creation response is a session", () => {
         useRegister()
-        mutationOptions().onSuccess?.(newUser)
 
-        expect(clear).toHaveBeenCalledOnce()
-        expect(clear.mock.invocationCallOrder[0]).toBeLessThan(
-            setQueryData.mock.invocationCallOrder[0],
-        )
-        expect(setQueryData).toHaveBeenCalledWith(authKeys.me(), newUser)
+        expect(mutationOptions().onSuccess).toBeUndefined()
+        expect(clear).not.toHaveBeenCalled()
+        expect(setQueryData).not.toHaveBeenCalled()
     })
 })
