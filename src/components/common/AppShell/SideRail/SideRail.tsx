@@ -6,7 +6,7 @@ import { None } from "oxide.ts";
 import { useChatLinks, useEditorLinks, useLogout } from "../../../../data/queries";
 import { EditModalContent } from "./EditModalContent";
 import { ChatModalContent } from "./ChatModalContent/ChatModalContent";
-import { useToast } from "../../Toast/Toast";
+import { useToast } from "../..";
 
 
 export function SideRail() {
