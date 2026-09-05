@@ -44,7 +44,10 @@ export function useCurrentUser(): CurrentUserState {
     }
 
     if (query.isError) {
-        return query.error.status === 401
+        // A dead/missing session means "logged out", not "the application broke".
+        // The backend now returns 401 for this, but tolerate legacy 403 responses
+        // so stale cookies from an older deployment cannot poison public auth flows.
+        return query.error.status === 401 || query.error.status === 403
             ? { status: "unauthenticated" }
             : { status: "error", error: query.error }
     }
